@@ -3,7 +3,7 @@ import pandas as pd
 
 st.set_page_config(page_title="川浩產品－成本計算工具", layout="centered")
 
-# 密碼保護
+  # 密碼保護
 PASSWORD = "gsc2025"
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
