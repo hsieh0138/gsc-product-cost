@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-st.set_page_config(page_title="川浩產品-成本計算工具", layout="centered")
+st.set_page_config(page_title="川浩產品－成本計算工具", layout="centered")
 
 # 密碼保護
 PASSWORD = "gsc2025"
@@ -9,17 +9,19 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
 if not st.session_state.authenticated:
-    st.title("📦 川浩產品－成本計算工具")-密碼保護")
+    st.image("https://www.gscbelt.com/images/logo.png", width=160)
+    st.title("📦 川浩產品－成本計算工具｜密碼保護")
     pwd = st.text_input("請輸入訪問密碼 (Enter Password)", type="password")
     if pwd == PASSWORD:
         st.session_state.authenticated = True
         st.rerun()
-
     elif pwd:
         st.error("密碼錯誤，請聯絡管理者 Password incorrect")
     st.stop()
 
-st.title("📦 川浩產品成本計算公式")
+# 成本計算主頁
+st.image("https://www.gscbelt.com/images/logo.png", width=160)
+st.title("📦 川浩產品－成本計算工具")
 
 st.markdown("""
 本工具支援多筆產品成本試算，可即時計算各產品之：
@@ -94,3 +96,4 @@ if results:
 
     csv = df_result.to_csv(index=False).encode("utf-8-sig")
     st.download_button("📥 下載結果 (CSV)", csv, file_name="product_cost_results.csv", mime="text/csv")
+
