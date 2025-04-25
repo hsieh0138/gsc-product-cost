@@ -9,7 +9,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
 if not st.session_state.authenticated:
-    st.image("logo.png", width=300)
+    st.image("https://raw.githubusercontent.com/hsieh0138/gsc-product-cost/main/logo.png", width=300)
     st.title("📦 川浩產品－成本計算工具｜密碼保護")
     pwd = st.text_input("請輸入訪問密碼 (Enter Password)", type="password")
     if pwd == PASSWORD:
