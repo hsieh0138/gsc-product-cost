@@ -13,7 +13,8 @@ if not st.session_state.authenticated:
     pwd = st.text_input("請輸入訪問密碼 (Enter Password)", type="password")
     if pwd == PASSWORD:
         st.session_state.authenticated = True
-        st.experimental_rerun()
+        st.rerun()
+
     elif pwd:
         st.error("密碼錯誤，請聯絡管理者 Password incorrect")
     st.stop()
