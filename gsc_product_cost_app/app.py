@@ -18,8 +18,7 @@ if not st.session_state.authenticated:
         <h3 style="margin-top: 0.5em; color: #666;">｜密碼保護｜</h3>
     </div>
     """,
-    unsafe_allow_html=True
-)
+    unsafe_allow_html=True)
 
 pwd = st.text_input("🔒 請輸入存取密碼", type="password", placeholder="請輸入密碼...")
 
