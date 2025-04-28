@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime
 from fpdf import FPDF
+import base64
 
 st.set_page_config(page_title="川浩產品－成本計算工具", layout="centered")
 
@@ -11,9 +12,9 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
 if not st.session_state.authenticated:
-    st.image("https://raw.githubusercontent.com/hsieh0138/gsc-product-cost/main/logo.png", width=300)
+    st.image("logo.png", width=200)
 
-    st.markdown("""
+    st.markdown(r"""
         <div style="text-align:center;">
             <h1>📦 川浩產品－成本計算工具</h1>
             <h3 style="margin-top: 0.5em; color: #666;">密碼保護</h3>
@@ -29,7 +30,6 @@ if not st.session_state.authenticated:
         st.stop()
 
 else:
-    # 登入成功
     st.title("📦 川浩產品－成本計算工具")
 
     st.markdown("""
@@ -48,7 +48,7 @@ else:
     st.markdown("---")
 
     # 匯率設定
-    exchange_rate = st.number_input("💱 當日匯率 (TWD ➔ USD)", value=31.5, step=0.01)
+    exchange_rate = st.number_input("💱 當日匯率 (TWD ➔ USD)", value=32.0, step=0.01)
 
     # 預設資料
     default_data = pd.DataFrame({
@@ -93,16 +93,16 @@ else:
 
             results.append({
                 "產品名稱 Product": row["產品名稱 Product"],
-                "原料成本 Material": row["原料成本 Material Cost"],
-                "人工成本 Labor": labor_cost,
-                "間接費用 Overhead": overhead_cost,
-                "包裝成本 Packaging": row["包裝成本 Packaging Cost"],
-                "機台成本 Machine": machine_cost,
-                "品管成本 QC": row["品管成本 QC Cost"],
-                "總成本 Total Cost": total_cost,
-                "建議售價 (TWD)": suggested_price,
-                "建議售價 (USD)": suggested_price_usd,
-                "利潤額 Profit Amount (TWD)": profit_amount,
+                "原料成本 Material (NTD)": row["原料成本 Material Cost"],
+                "人工成本 Labor (NTD)": labor_cost,
+                "間接費用 Overhead (NTD)": overhead_cost,
+                "包裝成本 Packaging (NTD)": row["包裝成本 Packaging Cost"],
+                "機台成本 Machine (NTD)": machine_cost,
+                "品管成本 QC (NTD)": row["品管成本 QC Cost"],
+                "總成本 Total Cost (NTD)": total_cost,
+                "建議售價 Suggested Price (NTD)": suggested_price,
+                "建議售價 Suggested Price (USD)": suggested_price_usd,
+                "利潤額 Profit Amount (NTD)": profit_amount,
             })
 
     if results:
@@ -111,9 +111,10 @@ else:
         df_result = pd.DataFrame(results)
         st.dataframe(df_result, use_container_width=True)
 
+        today = datetime.today().strftime("%Y-%m-%d")
+
         # 匯出 CSV
         csv = df_result.to_csv(index=False).encode("utf-8-sig")
-        today = datetime.today().strftime("%Y-%m-%d")
         st.download_button(
             label="📥 下載結果 (CSV)",
             data=csv,
@@ -122,60 +123,55 @@ else:
         )
 
         # 匯出 PDF
-        pdf = FPDF()
+        class PDF(FPDF):
+            def header(self):
+                self.image("logo.png", x=80, w=50)
+                self.ln(10)
+                self.set_font('Arial', 'B', 16)
+                self.cell(0, 10, '川浩產品 - 成本試算報表', ln=True, align='C')
+                self.set_font('Arial', '', 10)
+                self.cell(0, 10, f'匯出日期：{today}', align='R', ln=True)
+                self.ln(5)
+
+            def footer(self):
+                self.set_y(-15)
+                self.set_font('Arial', 'I', 8)
+                self.cell(0, 10, 'Good Success Corp Confidential', align='C')
+
+            def create_table(self, dataframe):
+                self.set_font('Arial', 'B', 9)
+                col_widths = [24] * len(dataframe.columns)
+                for idx, col in enumerate(dataframe.columns):
+                    self.cell(col_widths[idx], 8, col, border=1, align='C')
+                self.ln()
+                self.set_font('Arial', '', 9)
+                for _, row in dataframe.iterrows():
+                    for idx, item in enumerate(row):
+                        self.cell(col_widths[idx], 8, str(item), border=1, align='C')
+                    self.ln()
+
+        pdf = PDF()
         pdf.add_page()
-        pdf.set_font("Arial", size=12)
-        pdf.cell(0, 10, "川浩產品 - 成本分析報表", ln=True, align="C")
-        pdf.ln(10)
+        pdf.create_table(df_result)
 
-        for index, row in df_result.iterrows():
-            for col, value in row.items():
-                pdf.cell(0, 8, f"{col}: {value}", ln=True)
-            pdf.ln(5)
+        pdf_output_path = f"成本試算報表_{today}.pdf"
+        pdf.output(pdf_output_path)
 
-        pdf_output = f"成本試算報表_{today}.pdf"
-        pdf.output(pdf_output)
-
-        with open(pdf_output, "rb") as f:
+        with open(pdf_output_path, "rb") as f:
             pdf_data = f.read()
+
         st.download_button(
             label="📥 下載報表 (PDF)",
             data=pdf_data,
-            file_name=pdf_output,
+            file_name=pdf_output_path,
             mime="application/pdf"
         )
 
-        # 匯出 PDF
-        pdf = FPDF()
-        pdf.add_page()
-        pdf.set_font("Arial", size=12)
-        pdf.cell(0, 10, "川浩產品 - 成本分析報表", ln=True, align="C")
-        pdf.ln(10)
-
-        for index, row in df_result.iterrows():
-            for col, value in row.items():
-                pdf.cell(0, 8, f"{col}: {value}", ln=True)
-            pdf.ln(5)
-
-        pdf_output = f"成本試算報表_{today}.pdf"
-        pdf.output(pdf_output)
-
-        with open(pdf_output, "rb") as f:
-            pdf_data = f.read()
-
-        # --- 下載按鈕
-        st.download_button(
-            label="📥 下載報表 (PDF)",
-            data=pdf_data,
-            file_name=pdf_output,
-            mime="application/pdf"
-        )
-
-        # --- 預覽PDF（新增這一段）
-        import base64
+        # 預覽PDF
         b64_pdf = base64.b64encode(pdf_data).decode('utf-8')
         pdf_display = f'<iframe src="data:application/pdf;base64,{b64_pdf}" width="700" height="1000" type="application/pdf"></iframe>'
         st.markdown("### 📄 預覽報表 Preview PDF", unsafe_allow_html=True)
         st.markdown(pdf_display, unsafe_allow_html=True)
+
 
 
