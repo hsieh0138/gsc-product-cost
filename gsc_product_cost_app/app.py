@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 
@@ -6,31 +5,32 @@ st.set_page_config(page_title="川浩產品－成本計算工具", layout="cente
 
 # 密碼保護登入
 PASSWORD = "gsc2025"
-
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
 if not st.session_state.authenticated:
-    st.image("https://raw.githubusercontent.com/hsieh0138/gsc-product-cost/main/logo.png", width=300)
-    st.markdown("""
-    <div style="text-align:center;">
-        <h1>📦 川浩產品－成本計算工具</h1>
-        <h3 style="margin-top: 0.5em; color: #666;">密碼保護</h3>
-    </div>
-    """, unsafe_allow_html=True)
+    st.image("https://raw.githubusercontent.com/hsieh0138/gsc-product-cost/main/gsc_product_cost_app/logo.png", width=300)
 
-    pwd = st.text_input("🔒 請輸入存取密碼", type="password", placeholder="請輸入密碼...")
+    st.markdown("""
+        <div style="text-align:center;">
+            <h1>\ud83d\udce6 川浩產品－成本計算工具</h1>
+            <h3 style="margin-top: 0.5em; color: #666;">密碼保護</h3>
+        </div>
+        """, unsafe_allow_html=True)
+
+    pwd = st.text_input("\ud83d\udd12 請輸入存取密碼", type="password", placeholder="請輸入密碼...")
 
     if pwd == PASSWORD:
         st.session_state.authenticated = True
-        st.experimental_rerun()
+        st.rerun()
     elif pwd:
         st.error("密碼錯誤，請聯絡管理者")
         st.stop()
 
 else:
-    # 登入成功後，直接進主畫面
-    st.title("📦 川浩產品－成本計算工具")
+    # 登入成功後主畫面
+    st.title("\ud83d\udce6 川浩產品－成本計算工具")
+
     st.markdown("""
     本工具支援多筆產品成本試算，可即時計算各產品之：
 
@@ -44,16 +44,17 @@ else:
 
     支援多筆輸入與 Excel 匯出，適合對內核算與對外報價使用。
     """)
+
     st.markdown("---")
 
-    # 輸入資料
+    # 預設輸入資料
     default_data = pd.DataFrame({
         "產品名稱 Product": ["產品A", "產品B"],
         "原料成本 Material Cost": [80, 100],
         "製造時間 (分鐘) Work Time (min)": [15, 20],
         "包裝成本 Packaging Cost": [5, 6],
         "品管成本 QC Cost": [3, 3],
-        "毛利率 Profit Margin": [0.2, 0.25],
+        "毛利率 Profit Margin": [20, 25],  # 這裡填百分比，不是小數
     })
 
     edited_df = st.data_editor(default_data, num_rows="dynamic", use_container_width=True)
@@ -66,42 +67,46 @@ else:
     overhead_per_hour = 50
 
     # 成本計算
-results = []
-for _, row in edited_df.iterrows():
-    if row["產品名稱 Product"]:
-        time_hr = row["製造時間 (分鐘) Work Time (min)"] / 60
-        hourly_wage = monthly_salary / work_hours_per_month
-        real_hourly_cost = hourly_wage * (1 + labor_insurance_ratio)
+    results = []
+    for _, row in edited_df.iterrows():
+        if row["產品名稱 Product"]:
+            time_hr = row["製造時間 (分鐘) Work Time (min)"] / 60
+            hourly_wage = monthly_salary / work_hours_per_month
+            real_hourly_cost = hourly_wage * (1 + labor_insurance_ratio)
 
-        labor_cost = round(real_hourly_cost * time_hr, 2)
-        overhead_cost = round(overhead_per_hour * time_hr, 2)
-        machine_cost = round(machine_cost_per_hour * time_hr, 2)
+            labor_cost = round(real_hourly_cost * time_hr, 2)
+            overhead_cost = round(overhead_per_hour * time_hr, 2)
+            machine_cost = round(machine_cost_per_hour * time_hr, 2)
 
-        # 🔵 把毛利率從「百分數」轉成「小數」
-        profit_margin = row["毛利率 Profit Margin"] / 100  
+            # 毛利率輸入20代表20%（自動除以100）
+            profit_margin = row["毛利率 Profit Margin"] / 100
 
-        total_cost = round(
-            row["原料成本 Material Cost"] + labor_cost + overhead_cost +
-            row["包裝成本 Packaging Cost"] + machine_cost + row["品管成本 QC Cost"], 2)
+            total_cost = round(
+                row["原料成本 Material Cost"] + labor_cost + overhead_cost +
+                row["包裝成本 Packaging Cost"] + machine_cost + row["品管成本 QC Cost"], 2)
 
-        suggested_price = round(total_cost * (1 + profit_margin), 2)
+            suggested_price = round(total_cost * (1 + profit_margin), 2)
 
-        results.append({
-            "產品名稱 Product": row["產品名稱 Product"],
-            "原料成本 Material": row["原料成本 Material Cost"],
-            "人工成本 Labor": labor_cost,
-            "間接費用 Overhead": overhead_cost,
-            "包裝成本 Packaging": row["包裝成本 Packaging Cost"],
-            "機台成本 Machine": machine_cost,
-            "品管成本 QC": row["品管成本 QC Cost"],
-            "總成本 Total Cost": total_cost,
-            "建議售價 Suggested Price": suggested_price,
-        })
+            results.append({
+                "產品名稱 Product": row["產品名稱 Product"],
+                "原料成本 Material": row["原料成本 Material Cost"],
+                "人工成本 Labor": labor_cost,
+                "間接費用 Overhead": overhead_cost,
+                "包裝成本 Packaging": row["包裝成本 Packaging Cost"],
+                "機台成本 Machine": machine_cost,
+                "品管成本 QC": row["品管成本 QC Cost"],
+                "總成本 Total Cost": total_cost,
+                "建議售價 Suggested Price": suggested_price,
+            })
 
     if results:
         st.markdown("---")
-        st.subheader("📊 成本分析結果 Cost Breakdown")
+        st.subheader("\ud83d\udcca 成本分析結果 Cost Breakdown")
         df_result = pd.DataFrame(results)
+        st.dataframe(df_result, use_container_width=True)
+
+        csv = df_result.to_csv(index=False).encode("utf-8-sig")
+        st.download_button("\ud83d\udce5 下載結果 (CSV)", csv, file_name="product_cost_results.csv", mime="text/csv", key="download_button_1")
         st.dataframe(df_result, use_container_width=True)
 
         csv = df_result.to_csv(index=False).encode("utf-8-sig")
