@@ -66,34 +66,37 @@ else:
     overhead_per_hour = 50
 
     # 成本計算
-    results = []
-    for _, row in edited_df.iterrows():
-        if row["產品名稱 Product"]:
-            time_hr = row["製造時間 (分鐘) Work Time (min)"] / 60
-            hourly_wage = monthly_salary / work_hours_per_month
-            real_hourly_cost = hourly_wage * (1 + labor_insurance_ratio)
+results = []
+for _, row in edited_df.iterrows():
+    if row["產品名稱 Product"]:
+        time_hr = row["製造時間 (分鐘) Work Time (min)"] / 60
+        hourly_wage = monthly_salary / work_hours_per_month
+        real_hourly_cost = hourly_wage * (1 + labor_insurance_ratio)
 
-            labor_cost = round(real_hourly_cost * time_hr, 2)
-            overhead_cost = round(overhead_per_hour * time_hr, 2)
-            machine_cost = round(machine_cost_per_hour * time_hr, 2)
+        labor_cost = round(real_hourly_cost * time_hr, 2)
+        overhead_cost = round(overhead_per_hour * time_hr, 2)
+        machine_cost = round(machine_cost_per_hour * time_hr, 2)
 
-            total_cost = round(
-                row["原料成本 Material Cost"] + labor_cost + overhead_cost +
-                row["包裝成本 Packaging Cost"] + machine_cost + row["品管成本 QC Cost"], 2)
+        # 🔵 把毛利率從「百分數」轉成「小數」
+        profit_margin = row["毛利率 Profit Margin"] / 100  
 
-            suggested_price = round(total_cost * (1 + row["毛利率 Profit Margin"]), 2)
+        total_cost = round(
+            row["原料成本 Material Cost"] + labor_cost + overhead_cost +
+            row["包裝成本 Packaging Cost"] + machine_cost + row["品管成本 QC Cost"], 2)
 
-            results.append({
-                "產品名稱 Product": row["產品名稱 Product"],
-                "原料成本 Material": row["原料成本 Material Cost"],
-                "人工成本 Labor": labor_cost,
-                "間接費用 Overhead": overhead_cost,
-                "包裝成本 Packaging": row["包裝成本 Packaging Cost"],
-                "機台成本 Machine": machine_cost,
-                "品管成本 QC": row["品管成本 QC Cost"],
-                "總成本 Total Cost": total_cost,
-                "建議售價 Suggested Price": suggested_price,
-            })
+        suggested_price = round(total_cost * (1 + profit_margin), 2)
+
+        results.append({
+            "產品名稱 Product": row["產品名稱 Product"],
+            "原料成本 Material": row["原料成本 Material Cost"],
+            "人工成本 Labor": labor_cost,
+            "間接費用 Overhead": overhead_cost,
+            "包裝成本 Packaging": row["包裝成本 Packaging Cost"],
+            "機台成本 Machine": machine_cost,
+            "品管成本 QC": row["品管成本 QC Cost"],
+            "總成本 Total Cost": total_cost,
+            "建議售價 Suggested Price": suggested_price,
+        })
 
     if results:
         st.markdown("---")
