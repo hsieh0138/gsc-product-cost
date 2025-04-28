@@ -12,15 +12,12 @@ if "authenticated" not in st.session_state:
 if not st.session_state.authenticated:
     st.image("https://raw.githubusercontent.com/hsieh0138/gsc-product-cost/main/logo.png", width=300)
 
-    st.markdown(
-        """
+    st.markdown( """
         <div style="text-align:center;">
             <h1>📦 川浩產品－成本計算工具</h1>
             <h3 style="margin-top: 0.5em; color: #666;">密碼保護</h3>
         </div>
-        """,
-        unsafe_allow_html=True
-    )
+        """, unsafe_allow_html=True)
 
     pwd = st.text_input("🔒 請輸入存取密碼", type="password", placeholder="請輸入密碼...")
 
@@ -31,9 +28,10 @@ if not st.session_state.authenticated:
         st.error("密碼錯誤，請聯絡管理者")
         st.stop()
 
-# 登入成功後顯示主畫面
-st.image("https://raw.githubusercontent.com/hsieh0138/gsc-product-cost/main/logo.png", width=300)
+else:
+# 登入成功後，直接進主畫面，不要重複顯示 LOGO
 st.title("📦 川浩產品－成本計算工具")
+
 st.markdown("""
 本工具支援多筆產品成本試算，可即時計算各產品之：
 
