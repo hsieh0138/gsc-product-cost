@@ -16,7 +16,7 @@ if not st.session_state.authenticated:
         """
         <div style="text-align:center;">
             <h1>📦 川浩產品－成本計算工具</h1>
-            <h3 style="margin-top: 0.5em; color: #666;">｜密碼保護｜</h3>
+            <h3 style="margin-top: 0.5em; color: #666;">密碼保護</h3>
         </div>
         """,
         unsafe_allow_html=True
@@ -31,12 +31,12 @@ if not st.session_state.authenticated:
         st.error("密碼錯誤，請聯絡管理者")
         st.stop()
 
-# 主畫面顯示
+# 登入成功後顯示主畫面
 st.image("https://raw.githubusercontent.com/hsieh0138/gsc-product-cost/main/logo.png", width=300)
 st.title("📦 川浩產品－成本計算工具")
-
 st.markdown("""
 本工具支援多筆產品成本試算，可即時計算各產品之：
+
 - 原料成本
 - 直接人工（依據工時與時薪）
 - 製造間接費用
@@ -44,6 +44,8 @@ st.markdown("""
 - 機台使用成本
 - 品管檢驗成本
 - 毛利率設定與建議售價
+""")
+
 
 支援多筆輸入與 Excel 匯出，適合對內核算與對外報價使用。
 """)
