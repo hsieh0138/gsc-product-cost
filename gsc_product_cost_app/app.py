@@ -11,34 +11,25 @@ if "authenticated" not in st.session_state:
 
 if not st.session_state.authenticated:
     st.image("https://raw.githubusercontent.com/hsieh0138/gsc-product-cost/main/logo.png", width=300)
+
     st.markdown(
-    """
-    <div style="text-align:center;">
-        <h1>📦 川浩產品－成本計算工具</h1>
-        <h3 style="margin-top: 0.5em; color: #666;">｜密碼保護｜</h3>
-    </div>
-    """,
-    unsafe_allow_html=True)
+        """
+        <div style="text-align:center;">
+            <h1>📦 川浩產品－成本計算工具</h1>
+            <h3 style="margin-top: 0.5em; color: #666;">｜密碼保護｜</h3>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
-pwd = st.text_input("🔒 請輸入存取密碼", type="password", placeholder="請輸入密碼...")
+    pwd = st.text_input("🔒 請輸入存取密碼", type="password", placeholder="請輸入密碼...")
 
-""", unsafe_allow_html=True)
-
-pwd = st.text_input("🔒 請輸入存取密碼", type="password", placeholder="請輸入密碼...")
-
-<div style="text-align:center;">
-    <h1>📦 川浩產品－成本計算工具</h1>
-    <h3 style="margin-top: 0.5em;">密碼保護</h3>
-</div>
-""", unsafe_allow_html=True)
-
-    pwd = st.text_input("請輸入訪問密碼 (Enter Password)", type="password")
     if pwd == PASSWORD:
         st.session_state.authenticated = True
         st.rerun()
     elif pwd:
-        st.error("密碼錯誤，請聯絡管理者 Password incorrect")
-    st.stop()
+        st.error("密碼錯誤，請聯絡管理者")
+        st.stop()
 
 # 主畫面顯示
 st.image("https://raw.githubusercontent.com/hsieh0138/gsc-product-cost/main/logo.png", width=300)
