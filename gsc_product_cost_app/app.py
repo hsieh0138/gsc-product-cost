@@ -20,6 +20,10 @@ if not st.session_state.authenticated:
 
 pwd = st.text_input("🔒 請輸入存取密碼", type="password", placeholder="請輸入密碼...")
 
+""", unsafe_allow_html=True)
+
+pwd = st.text_input("🔒 請輸入存取密碼", type="password", placeholder="請輸入密碼...")
+
 <div style="text-align:center;">
     <h1>📦 川浩產品－成本計算工具</h1>
     <h3 style="margin-top: 0.5em;">密碼保護</h3>
