@@ -1,15 +1,16 @@
+
 import streamlit as st
 import pandas as pd
 
 st.set_page_config(page_title="川浩產品－成本計算工具", layout="centered")
 
-# 密碼保護
+# 密碼保護登入
 PASSWORD = "gsc2025"
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
 if not st.session_state.authenticated:
-    st.image("https://www.gscbelt.com/images/logo.png", width=160)
+    st.image("https://raw.githubusercontent.com/hsieh0138/gsc-product-cost/main/logo.png", width=300)
     st.title("📦 川浩產品－成本計算工具｜密碼保護")
     pwd = st.text_input("請輸入訪問密碼 (Enter Password)", type="password")
     if pwd == PASSWORD:
@@ -19,8 +20,8 @@ if not st.session_state.authenticated:
         st.error("密碼錯誤，請聯絡管理者 Password incorrect")
     st.stop()
 
-# 成本計算主頁
-st.image("https://www.gscbelt.com/images/logo.png", width=160)
+# 主畫面顯示
+st.image("https://raw.githubusercontent.com/hsieh0138/gsc-product-cost/main/logo.png", width=300)
 st.title("📦 川浩產品－成本計算工具")
 
 st.markdown("""
@@ -38,8 +39,7 @@ st.markdown("""
 
 st.markdown("---")
 
-# 輸入多筆產品資料
-st.subheader("📋 輸入多筆產品資料 (Multiple Product Inputs)")
+# 輸入資料
 default_data = pd.DataFrame({
     "產品名稱 Product": ["產品A", "產品B"],
     "原料成本 Material Cost": [80, 100],
@@ -51,14 +51,14 @@ default_data = pd.DataFrame({
 
 edited_df = st.data_editor(default_data, num_rows="dynamic", use_container_width=True)
 
-# 固定參數（可自訂）
+# 固定參數
 monthly_salary = 27470
 work_hours_per_month = 22 * 8
 labor_insurance_ratio = 0.13
 machine_cost_per_hour = 80
 overhead_per_hour = 50
 
-# 成本計算公式
+# 成本計算
 results = []
 for _, row in edited_df.iterrows():
     if row["產品名稱 Product"]:
@@ -96,4 +96,3 @@ if results:
 
     csv = df_result.to_csv(index=False).encode("utf-8-sig")
     st.download_button("📥 下載結果 (CSV)", csv, file_name="product_cost_results.csv", mime="text/csv")
-
