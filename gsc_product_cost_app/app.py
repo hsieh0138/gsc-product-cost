@@ -99,3 +99,31 @@ else:
         now = datetime.now().strftime("%Y-%m-%d")
         csv = df_result.to_csv(index=False).encode("utf-8-sig")
         st.download_button("📥 下載結果 (CSV)", csv, file_name=f"成本試算結果_{now}.csv", mime="text/csv")
+
+    # PDF 匯出
+    def generate_pdf(df):
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.add_font("Arial", "", fname=None, uni=True)
+        pdf.set_font("Arial", size=12)
+        pdf.cell(200, 10, txt="成本分析報表", ln=True, align="C")
+        pdf.ln(10)
+
+        for i, row in df.iterrows():
+            for col in df.columns:
+                pdf.cell(0, 10, txt=f"{col}: {row[col]}", ln=True)
+            pdf.ln(5)
+
+        output = f"/tmp/gsc_cost_result_{date_tag}.pdf"
+        pdf.output(output)
+        return output
+
+    if st.button("📄 匯出 PDF 報表"):
+        pdf_path = generate_pdf(df_result)
+        with open(pdf_path, "rb") as f:
+            st.download_button(
+                label="📩 下載 PDF",
+                data=f,
+                file_name=f"成本試算報表_{date_tag}.pdf",
+                mime="application/pdf"
+            )
