@@ -41,7 +41,7 @@ else:
     default_data = pd.DataFrame({
         "產品名稱 Product": ["產品A", "產品B"],
         "原料成本 Material Cost": [80, 100],
-        "製造時間 (分鐘) Work Time (min)": [15, 20],
+        "製造時間 (分鐘) Work Time (min)": [30, 20],
         "包裝成本 Packaging Cost": [5, 6],
         "品管成本 QC Cost": [3, 3],
         "毛利率 Profit Margin (%)": [20, 25],
@@ -54,7 +54,7 @@ else:
     labor_insurance_ratio = 0.13
     machine_cost_per_hour = 80
     overhead_per_hour = 50
-    exchange_rate = st.number_input("💱 輸入當前匯率（TWD→USD）", value=32.0)
+    exchange_rate = st.number_input("💱 請輸入匯率（TWD→USD）", value=32.0)
 
     results = []
     for _, row in edited_df.iterrows():
@@ -85,9 +85,9 @@ else:
                 "機台成本 Machine": machine_cost,
                 "品管成本 QC": row["品管成本 QC Cost"],
                 "總成本 Total Cost": total_cost,
-                "建議售價 Suggested Price": suggested_price,
-                "利潤 Profit": profit,
-                "USD售價 Price(USD)": usd_price
+                "建議售價 Suggested Price (NTD)": suggested_price,
+                "建議售價 Suggested Price (USD)": usd_price,
+                "利潤額 Profit (NTD)": profit,
             })
 
     if results:
